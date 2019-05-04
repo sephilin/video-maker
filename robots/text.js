@@ -13,7 +13,7 @@ const sentenceBoundaryDetection = require('sbd')
     async function fecthContentFromWikipedia(content){
         const input = {
             "articleName": content.searchTerm,
-            "lang": "en"
+            "lang": content.languageContent
           };
 
         const algorithmiaAuthenticated = algorithmia.client(algorithmiaApiKey)
