@@ -1,0 +1,25 @@
+{
+  "name": "video-maker",
+  "version": "1.0.0",
+  "description": "Robo que faz video automatico",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sephilin/video-maker.git"
+  },
+  "keywords": [
+    "inicial"
+  ],
+  "author": "Vitor Menezes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sephilin/video-maker/issues"
+  },
+  "homepage": "https://github.com/sephilin/video-maker#readme",
+  "dependencies": {
+    "readline-sync": "^1.4.9"
+  }
+}
