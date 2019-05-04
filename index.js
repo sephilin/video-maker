@@ -5,19 +5,23 @@ const robots = {
 
  const start = async () => {
     const content = {
-        searchTerm: "",
-        languageContent: "",
-        prefix: "",
-        sourceContentOrignal: "",
-        sourceContentSanitized: "",
-        sentences: [
-            {
-                text:"",
-                keywords: [""],
-                images: [""]
-            }
-        ]
+        maximumSentences: 7        
     }
+
+    // const content = {
+    //     searchTerm: "",
+    //     languageContent: "",
+    //     prefix: "",
+    //     sourceContentOrignal: "",
+    //     sourceContentSanitized: "",
+    //     sentences: [
+    //         {
+    //             text:"",
+    //             keywords: [""],
+    //             images: [""]
+    //         }
+    //     ]
+    // }
 
     content.searchTerm = askAndReturnSearchTerm()
     content.prefix = askAndReturnPrefix()
@@ -40,7 +44,8 @@ const robots = {
         const selectedPrefixIndex = readline.keyInSelect(prefixes, 'Escolha a linguagem: ')       
         return prefixes[selectedPrefixIndex]
     }
-    //console.log(content)
+
+    console.log(JSON.stringify(content, null, 4))   
 }
 
 start()
