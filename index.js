@@ -1,51 +1,15 @@
-const readline = require('readline-sync')
 const robots = {
-    text: require('./robots/text.js')
+    input: require('./robots/input.js'),
+    text: require('./robots/text.js'),
+    state: require('./robots/state.js')
 }
 
- const start = async () => {
-    const content = {
-        maximumSentences: 7        
-    }
+ const start = async () => {   
+     await robots.input()   
+     await robots.text() 
 
-    // const content = {
-    //     searchTerm: "",
-    //     languageContent: "",
-    //     prefix: "",
-    //     sourceContentOrignal: "",
-    //     sourceContentSanitized: "",
-    //     sentences: [
-    //         {
-    //             text:"",
-    //             keywords: [""],
-    //             images: [""]
-    //         }
-    //     ]
-    // }
-
-    content.searchTerm = askAndReturnSearchTerm()
-    content.prefix = askAndReturnPrefix()
-    content.languageContent = askAndReturnLanguage()
-
-    await robots.text(content)
-
-    function askAndReturnSearchTerm(){
-        return readline.question('Escreva o termo buscado no Wikipedia: ')
-    }
-
-    function askAndReturnPrefix(){
-        const prefixes = ['Who is', 'What is', 'The history of' ]
-        const selectedPrefixIndex = readline.keyInSelect(prefixes, 'Escolha uma opcao: ')       
-        return prefixes[selectedPrefixIndex]
-    }
-
-    function askAndReturnLanguage(){
-        const prefixes = ['en', 'pt-br', 'fr' ]
-        const selectedPrefixIndex = readline.keyInSelect(prefixes, 'Escolha a linguagem: ')       
-        return prefixes[selectedPrefixIndex]
-    }
-
-    console.log(JSON.stringify(content, null, 4))   
+     const content = robots.state.load()
+     console.dir(content, { depth: null })
 }
 
 start()
