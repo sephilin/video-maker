@@ -61,8 +61,11 @@ typings/
 .next
 
 #credentials
-/credentials/*.json
+credentials/*.json
 
 #content.json
 content.json
+
+#content of imagems
+content/*.png
 

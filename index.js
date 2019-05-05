@@ -6,8 +6,8 @@ const robots = {
 }
 
  const start = async () => {   
-    //  await robots.input()   
-    //  await robots.text() 
+     await robots.input()   
+     await robots.text() 
      await robots.image()
 
      const content = robots.state.load()
