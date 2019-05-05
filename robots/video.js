@@ -3,11 +3,11 @@ const gm = require('gm').subClass({imageMagick: true})
 
 const robot = async() => {
     const content = state.load()
-    //await convertAllImages(content)
-    //await createAllSentencesImages(content)
+    await convertAllImages(content)
+    await createAllSentencesImages(content)
 
     await createYoutubeThumbnail()
-    //state.save(content)
+    state.save(content)
 
     async function convertAllImages(content){
         for(let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++){
@@ -60,8 +60,7 @@ const robot = async() => {
     }
 
     async function createSentenceImage(sentenceIndex, sentenceText){
-        return new Promise((resolve, reject) => {
-            console.log(`Preparando sentenca: ${sentenceText}`)
+        return new Promise((resolve, reject) => {            
             const outputFile = `./content/${sentenceIndex}-sentence.png`
 
             const templateSettings = {
