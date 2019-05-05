@@ -68,4 +68,5 @@ content.json
 
 #content of imagems
 content/*.png
+content/*.jpg
 

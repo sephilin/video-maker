@@ -10,13 +10,13 @@ const googleSearchCredentials = require('../credentials/google-search.json')
 const robot = async() => {
     const content = state.load()
 
-    await cleanContentFolder()
+    //await cleanContentFolder()
 
-    await fetchImagesOfAllSentences(content)
+    //await fetchImagesOfAllSentences(content)
 
-    await downloadAllImages(content)
+    //await downloadAllImages(content)
 
-    state.save(content)
+    //state.save(content)
 
     async function fetchImagesOfAllSentences(content){
         for (const sentence of content.sentences){
@@ -95,7 +95,6 @@ const robot = async() => {
             dest: `./content/${fileName}`
         })
     }
-   
 }
 
 module.exports = robot
