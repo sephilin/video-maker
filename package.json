@@ -21,11 +21,16 @@
   "homepage": "https://github.com/sephilin/video-maker#readme",
   "dependencies": {
     "algorithmia": "^0.3.10",
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
     "gm": "^1.23.1",
     "googleapis": "^39.2.0",
     "image-downloader": "^3.4.2",
     "readline-sync": "^1.4.9",
     "sbd": "^1.0.15",
+    "subtitle": "^2.0.3",
+    "videoshow": "^0.1.11",
     "watson-developer-cloud": "^4.0.1"
-  }
+  },
+  "devDependencies": {}
 }

@@ -1,21 +1,33 @@
 const state = require('./state.js')
+const spawn = require('child_process').spawn
+const exec = require('child_process').exec;
 const gm = require('gm').subClass({imageMagick: true})
+const videoshow = require('videoshow')
+const fs = require('fs')
+const path = require('path')
+const rootPath = path.resolve(__dirname, '..')
+const subtitle = require('subtitle')
+var fffmpeg = require('fluent-ffmpeg');
 
 const robot = async() => {
+    const loop = 8;
     const content = state.load()
-    await convertAllImages(content)
-    await createAllSentencesImages(content)
-
+    await convertAllImages(content)   
     await createYoutubeThumbnail()
+    await createConfigVideo(content)
+    await createSubtitles(content)
+    await renderYoutubeVideo(content)
+    await mergeSubtitlesAndYoutubeVideo(content)
+
     state.save(content)
 
     async function convertAllImages(content){
         for(let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++){
-            await convertImage(sentenceIndex)
+            await convertImage(sentenceIndex, content.sentences[sentenceIndex])
         }
     }
     
-    async function convertImage(sentenceIndex){
+    async function convertImage(sentenceIndex, sentence){
         return new Promise((resolve, reject) => {
             const inputFile = `./content/${sentenceIndex}-original.png[0]`
             const outputFile = `./content/${sentenceIndex}-converted.png`
@@ -48,69 +60,11 @@ const robot = async() => {
                     }
 
                     console.log(`Imagem convertida: ${outputFile}`)
+                    sentence.imagePath = outputFile
                     resolve()                
                 })
         })       
     }
-
-    async function createAllSentencesImages(content){
-        for(let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++){
-            await createSentenceImage(sentenceIndex, content.sentences[sentenceIndex].text)
-        }
-    }
-
-    async function createSentenceImage(sentenceIndex, sentenceText){
-        return new Promise((resolve, reject) => {            
-            const outputFile = `./content/${sentenceIndex}-sentence.png`
-
-            const templateSettings = {
-                0: {
-                    size: '1920x400',
-                    gravity: 'center'
-                },
-                1: {
-                    size: '1920x1000',
-                    gravity: 'center'
-                },
-                2: {
-                    size: '800x1000',
-                    gravity: 'west'
-                },
-                3: {
-                    size: '1920x400',
-                    gravity: 'center'
-                },
-                4: {
-                    size: '1920x1000',
-                    gravity: 'center'
-                },
-                5: {
-                    size: '800x1080',
-                    gravity: 'west'
-                },
-                6: {
-                    size: '1920x400',
-                    gravity: 'center'
-                }                
-            }
-
-            gm()
-                .out('-size', templateSettings[sentenceIndex].size)
-                .out('-gravity', templateSettings[sentenceIndex].gravity)
-                .out('-background', 'transparent')
-                .out('-fill', 'white')
-                .out('-kerning', '-1')
-                .out(`caption:${sentenceText}`)
-                .write(outputFile, (error) => {
-                    if(error){
-                        return reject(error)
-                    }
-
-                    console.log(`sentenca criada: ${outputFile}`)
-                    resolve()
-                })
-        })
-    }   
 
     async function createYoutubeThumbnail(){
         return new Promise((resolve, reject) => {
@@ -125,6 +79,117 @@ const robot = async() => {
                 resolve()
             })
         })
+    }
+    
+    async function createConfigVideo(content){
+        const nameVideo = `${content.searchTerm.trim().replace(' ','')}.mp4`
+        const destinationPath = `${rootPath}/content/${nameVideo}`
+       
+        var images = []
+
+        for(let imageIndex = 0; imageIndex < content.sentences.length; imageIndex++){
+            images.push(content.sentences[imageIndex].imagePath);
+        }
+
+        var videoConfig =  {
+            output: destinationPath,            
+            options: {
+              fps: 25,
+              loop: loop,
+              transition: true,
+              transitionDuration: 1,
+              videoBitrate: 1024, 
+              videoCodec: 'libx264',         
+              size: "640x?",
+              audioBitrate: "128k",
+              audioChannels: 2,
+              format: "mp4",
+              outputOptions: ['-pix_fmt yuv420p']           
+            },
+            images: images
+          }
+
+        state.saveVideoConfig(videoConfig)
+        content.destinationPath = destinationPath
+        content.nameVideo = nameVideo
+    }
+
+    async function createSubtitles(content){
+        const subtitles = []
+        const timeBreak = 1000; // milliseconds
+        const sentenceDuration = (loop - 1) * timeBreak; // milliseconds
+
+        let currentTime = timeBreak;       
+        let subDuration = sentenceDuration;
+
+        for(let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++){
+
+            const sub = {
+                start: currentTime,
+                end: subDuration,
+                text: content.sentences[sentenceIndex].text
+            }
+            subtitles.push(sub);
+
+            currentTime = subDuration + timeBreak
+            subDuration = sentenceDuration + currentTime
+        }
+
+          const srt = subtitle.stringify(subtitles)
+          
+          state.saveVideoSubtitle(srt)
+    }
+
+    async function renderYoutubeVideo(content){
+        return new Promise((resolve, reject) => {
+            const ffmpegRender = `videoshow`     
+            const videoConfig = `${rootPath}/videoConfig.json`
+            const audionPath = `${rootPath}/audio/song.mp3`
+
+            const options = [                
+                '--config', videoConfig,
+                '--output', content.destinationPath,
+                '--audio', audionPath               
+            ]
+
+            console.log('rendenizando o video...', ffmpegRender, options.join(' '))
+            
+            var cmd = `${ffmpegRender} ${options.join(' ')}`
+
+            exec(cmd, function(error, stdout, stderr) {
+                if(error){
+                    console.error(`Error: ${error}`)
+                }
+
+                if(stdout){
+                    console.log('Video rendenizado', stdout)
+                }
+
+                if(stderr){
+                    console.error('stderr', stderr)
+                }         
+                resolve()           
+            });
+        })
+    }
+
+    async function mergeSubtitlesAndYoutubeVideo(content){
+        const subtitlePath = './content/subtitle.srt'
+        const videoPath = `./content/${content.nameVideo}`
+        const videoDestinationPath = `./content/s_${content.nameVideo}`
+        const outputOptions = `-vf subtitles=${subtitlePath}:force_style='Fontsize=20,PrimaryColour=&HDDDE5F&'"`
+        const videoCodec = 'libx264'
+
+        fffmpeg(videoPath)
+            .videoCodec(videoCodec)            
+            .outputOptions(outputOptions)
+            .on('error', function(err) {
+                console.error(`Error: ${err}`)
+            })
+            .save(videoDestinationPath)
+            .on('end', function() {
+                console.log('sucess')              
+            })
     }
 }
 

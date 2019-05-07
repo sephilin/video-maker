@@ -1,5 +1,7 @@
 const fs = require('fs')
 const contentFilePath = './content.json'
+const configFilePath = './videoConfig.json'
+const subtitleFilePath = './content/subtitle.srt'
 
 const save = (content) => {
     const contentString = JSON.stringify(content)
@@ -12,7 +14,18 @@ const load = () => {
     return contenJson
 }
 
+const saveVideoConfig = (videoConfig) => {
+    const contentString = JSON.stringify(videoConfig)
+    return fs.writeFileSync(configFilePath, contentString)
+}
+
+const saveVideoSubtitle = (subtitle) => {
+    return fs.writeFileSync(subtitleFilePath, subtitle)
+}
+
 module.exports = {
     save,
-    load
+    load,
+    saveVideoConfig,
+    saveVideoSubtitle
 }
