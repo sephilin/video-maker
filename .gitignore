@@ -66,7 +66,16 @@ credentials/*.json
 #content.json
 content.json
 
-#content of imagems
+#videoConfig.json
+videoConfig.json
+
+#content of imagems and subtitles
 content/*.png
 content/*.jpg
+content/*.mp4
+content/*.srt
+
+#audio
+audio/*.mp3
+
 

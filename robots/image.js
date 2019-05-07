@@ -10,17 +10,15 @@ const googleSearchCredentials = require('../credentials/google-search.json')
 const robot = async() => {
     const content = state.load()
 
-    //await cleanContentFolder()
+    await cleanContentFolder()
+    await fetchImagesOfAllSentences(content)
+    await downloadAllImages(content)
 
-    //await fetchImagesOfAllSentences(content)
-
-    //await downloadAllImages(content)
-
-    //state.save(content)
+    state.save(content)
 
     async function fetchImagesOfAllSentences(content){
         for (const sentence of content.sentences){
-            const query = `${content.searchTerm}}`
+            const query = `${content.searchTerm}`
             sentence.images = await fetchGoogleAndReturnImagesLinks(query, sentence.keywords)
             sentence.googleSearchQuery = query
         }
