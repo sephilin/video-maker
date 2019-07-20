@@ -1,0 +1,4 @@
+pasta onde sera realizado a magica.
+atenção, ao final do processo, dois videos serão produzidos:
+*.mp4 - original
+s_*.mp4 - video com legenda
