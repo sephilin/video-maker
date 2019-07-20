@@ -75,7 +75,4 @@ content/*.jpg
 content/*.mp4
 content/*.srt
 
-#audio
-audio/*.mp3
-
 

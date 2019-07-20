@@ -152,7 +152,7 @@ const robot = async() => {
                 '--audio', audionPath               
             ]
 
-            console.log('rendenizando o video...', ffmpegRender, options.join(' '))
+            console.log('renderizando o video...', ffmpegRender, options.join(' '))
             
             var cmd = `${ffmpegRender} ${options.join(' ')}`
 
